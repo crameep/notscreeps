@@ -1,35 +1,50 @@
-var roleBuilder = require('role.builder');
+/*
+ * Module code goes here. Use 'module.exports' to export things:
+ * module.exports.thing = 'a thing';
+ *
+ * You can import it from another modules like this:
+ * var mod = require('role.builder');
+ * mod.thing == 'a thing'; // true
+ */
 
-var roleRepairer = {
+var roleRepairer =
+{
+       /** @param {Creep} creep **/
+    run: function(creep)
+    {
+        //console.log(creep.memory.state); 
+        var states = require('core.States');
 
-    /** @param {Creep} creep **/
-    run: function(creep) {
-    if(creep.memory.repairing && creep.carry.energy == 0) {
-      creep.memory.repairing = false;
-    }
-    if(!creep.memory.repairing && creep.carry.energy == creep.carryCapacity) {
-      creep.memory.repairing = true;
-    }
+        switch (creep.memory.state)
+        {
+            case 'PickUpResources':
+                states.PickUpResources.run(creep,'RepairUrgent', 'PickUpResources');
+                break;
 
-    if(creep.memory.repairing) {
-      let repairSite = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-        filter: (structure) => structure.hits < structure.hitsMax && structure.structureType != STRUCTURE_WALL
-      });
-      if(repairSite) {
-        if(creep.repair(repairSite) == ERR_NOT_IN_RANGE) {
-          creep.moveTo(repairSite);
+// Don't want builders trying to harvest.
+// No resources? Tough luck.
+           case 'HarvestNearestNode':
+               states.HarvestNearestNode.run(creep,'RepairUrgent','PickUpResources');
+               break;
+
+            case 'RepairUrgent':
+                states.RepairUrgent.run(creep, 'PickUpResources', 'RepairNonUrgent');
+                break;
+
+            case 'RepairNonUrgent':
+                states.RepairNonUrgent.run(creep, 'PickUpResources', 'UpgradeController');
+                break;
+
+            //Should only be called if we *REALLY* don't have anything to do
+            // Also... we should stop doing this as soon as other work is available (To-Do)
+            case 'UpgradeController':
+                states.UpgradeController.run(creep, 'PickUpResources', 'RepairUrgent');
+                break;
+
+            default:
+                creep.memory.state = 'PickUpResources';
         }
-      } else {
-        roleBuilder.run(creep);
-      }
-    }
-    else {
-      let source = creep.pos.findClosestByRange(FIND_SOURCES);
-      if(creep.harvest(source) == ERR_NOT_IN_RANGE) {
-        creep.moveTo(source);
-      }
-    }
+
     }
 };
-
 module.exports = roleRepairer;
