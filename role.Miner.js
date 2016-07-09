@@ -16,6 +16,7 @@ var roleMiner =
 
         var nextState = '';
         var altState = '';
+        //console.log(creep.memory.state);
 
         // Determine Current & Next States
 

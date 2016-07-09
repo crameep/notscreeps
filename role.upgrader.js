@@ -29,6 +29,11 @@ var roleUpgrader =
         {
             case 'PickUpResources':
                 nextState = 'UpgradeController';
+                altState = 'HarvestNearestNode';
+                break;
+                
+            case 'HarvestNearestNode':
+                nextState = 'UpgradeController';
                 altState = 'PickUpResources';
                 break;
 

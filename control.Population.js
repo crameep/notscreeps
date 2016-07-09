@@ -172,6 +172,7 @@ Population.prototype._getNextSpawn =  function ()
     //What should we spawn next.
     var nextSpawns = [] ;
     var spawnPriority = 0;
+    var sources = this.room.find(FIND_SOURCES);
 
     // ----------------------------
     spawnPriority = 1;  // (lower is better)
@@ -221,14 +222,16 @@ Population.prototype._getNextSpawn =  function ()
     // ----------------------------
 
     // if we have no upgraders, spawn one
-    if ( !this.creepTypeDistribution.roles.upgrader )
+    if ( !this.creepTypeDistribution.roles.upgrader)
     {
         // console.log('contol.Population: Priority ' + spawnPriority + ': Room [' + this.room.name + '] has no dedicated upgrader creeps.');
         nextSpawns.push ( {spawnPriority: spawnPriority, creepType: 'SCV', creepRole: 'upgrader'} );
     }
     // Try to get a miner on each resource
-    if ( this.creepTypeDistribution.roles.miner < (this.sources.length * 2) )
+    
+    if ( this.creepTypeDistribution.roles.miner < sources.length  )
     {
+        
         // console.log('contol.Population: Priority ' + spawnPriority + ': Room [' + this.room.name + '] has less miners than resource nodes.');
         nextSpawns.push ( {spawnPriority: spawnPriority, creepType: 'SEV', creepRole: 'miner'} );
     }
@@ -251,7 +254,8 @@ Population.prototype._getNextSpawn =  function ()
     spawnPriority = 9;  // (lower is better)
     // ----------------------------
     //Try out a few archers
-    if (this.creepTypeDistribution.roles.archer <= 5) { 
+    if (!this.creepTypeDistribution.roles.archer || this.creepTypeDistribution.roles.archer <= 5) {
+        //console.log("need some archers");
     nextSpawns.push ( {spawnPriority: spawnPriority, creepType: 'AXE', creepRole: 'archer'} );
     }
 
@@ -259,7 +263,7 @@ Population.prototype._getNextSpawn =  function ()
     // var tmp = _(nextSpawns).sortBy('spawnPriority'); // Doesn't really work, tmp[0] returns undefined object
      //console.log('getNextSpawn: ' + JSON.stringify(nextSpawns[0]) );
     // console.log('getNextSpawn: sorted: ' + JSON.stringify(tmp) );
-    // console.log('getNextSpawn: sorted (next): ' + JSON.stringify(tmp[0]) );
+    //console.log('getNextSpawn: sorted: ' + JSON.stringify(nextSpawns) );
 
     return nextSpawns[0];
 };

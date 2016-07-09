@@ -31,7 +31,8 @@ run: function (creep, newState, altState)
     else
     {
         //Target does not exist
-        console.log(creep.name + ': Current target invalid.');
+        //Or may not have enough energy to harvest.
+        console.log(creep.name + ': Current target invalid. ' + target);
         creep.memory.state = altState;
         creep.say(creep.memory.state);
         console.log(altState);
